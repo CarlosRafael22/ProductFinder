@@ -17,11 +17,11 @@ class TestViews:
         import os
         file_name = 'test.json'
         if os.path.exists(file_name):
-            products = DataRetriever.get_products_from_json(file_name)
+            products = retrieve_products_from_json(file_name)
             assert products[0] != None
         else:
             with pytest.raises(Exception):
-                products = DataRetriever.get_products_from_json(file_name)
+                products = retrieve_products_from_json(file_name)
 
 
         

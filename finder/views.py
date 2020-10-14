@@ -18,9 +18,9 @@ def save_products_on_json(products_dicts: List[dict], file_name: str):
     DataRetriever.store_products_on_json(products_dicts, file_name)
 
 
-def retrieve_products_from_json(products_dicts: List[dict], file_name: str) -> List[Product]:
+def retrieve_products_from_json(file_name: str) -> List[Product]:
     ''' Loads list of products from json file '''
-    products = DataRetriever.get_products_from_json(products_dicts, file_name)
+    products = DataRetriever.get_products_from_json(file_name)
     return products
 
 
