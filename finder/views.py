@@ -4,7 +4,7 @@ from typing import List
 import sys
 sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furniture Scraping\\')
 from extractor import PageExtractor, DataRetriever
-from products import Product
+from products import Product, ProductDatabase
 
 
 def get_products_from_query(query: str) -> List[dict]:
@@ -27,21 +27,32 @@ def retrieve_products_from_json(file_name: str) -> List[Product]:
 
 # Create your views here.
 def render_main(request):
-    # from extractor import PageExtractor, DataRetriever
-    # # import pdb; pdb.set_trace()
-    # page = PageExtractor('magazineluiza')
-    # products_dicts = page.query_webdriver('cadeira gamer')
-
-    # page = PageExtractor('submarino')
-    # products_dicts2 = page.query_webdriver('cadeira gamer')
-
-    # selected_products = products_dicts[:10] + products_dicts2[:10]
-    # page.store_products_on_json(selected_products, 'products.json')
-
-    # selected_products = DataRetriever.get_products_from_json('products.json')
     products = retrieve_products_from_json('search_products.json')
 
-    context = {'products': products, 'products_total': len(products)}
+    query_keys_list = [*request.GET]
+    filtered_products = products
+    # If it comes with params then we need to filter before sending response
+    
+    if len(query_keys_list) > 0:
+        parsed_query = {}
+        for key, value in request.GET.items():
+            if 'order_by_' not in key:
+                parsed_query[key] = float(value)
+            else:
+                # If there is an order_by params we get the attribute its sorting and order
+                attribute = key.split('order_by_')[1]
+                order = value
+
+
+        filtered_products = ProductDatabase.filter(**parsed_query)
+        print(filtered_products)
+        # If there is an order_by params we get the attribute its sorting and order
+        if attribute and order:
+            reversed = order == 'desc'
+            filtered_products.sort(key=lambda prod: getattr(prod, attribute), reverse=reversed)
+        print(filtered_products)
+
+    context = {'products': filtered_products, 'products_total': len(filtered_products)}
     return render(request, 'finder/main.html', context)
 
 
