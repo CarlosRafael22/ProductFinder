@@ -4,12 +4,13 @@ from typing import List
 import sys
 sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furniture Scraping\\')
 from extractor import PageExtractor, DataRetriever
-from products import Product, ProductDatabase
+from products import Product as ProductObject, ProductDatabase
+from .models import Product
 
 
 def get_products_from_query(query: str) -> List[dict]:
     ''' Returns a list of dictionaries with the products queried with the DataRetriever query_for method '''
-    retriever = DataRetriever(['americanas', 'submarino'])
+    retriever = DataRetriever(['submarino', 'extra', 'casasbahia'])
     products_dicts = retriever.query_for(query)
     return products_dicts
 
@@ -19,7 +20,7 @@ def save_products_on_json(products_dicts: List[dict], file_name: str):
     DataRetriever.store_products_on_json(products_dicts, file_name)
 
 
-def retrieve_products_from_json(file_name: str) -> List[Product]:
+def retrieve_products_from_json(file_name: str) -> List[ProductObject]:
     ''' Loads list of products from json file '''
     products = DataRetriever.get_products_from_json(file_name)
     return products
@@ -37,7 +38,9 @@ def render_main(request):
         parsed_query = {}
         for key, value in request.GET.items():
             if 'order_by_' not in key:
-                parsed_query[key] = float(value)
+                parsed_query[key] = float(value) if 'contains' not in key else value
+                attribute = None
+                order = None
             else:
                 # If there is an order_by params we get the attribute its sorting and order
                 attribute = key.split('order_by_')[1]
@@ -54,6 +57,16 @@ def render_main(request):
 
     context = {'products': filtered_products, 'products_total': len(filtered_products)}
     return render(request, 'finder/main.html', context)
+
+
+def create_product_model_from_dict(product_dict):
+    product = Product.objects.create(
+        name=product_dict['name'],
+        price=product_dict['price'],
+        link=product_dict['link'],
+        image_url=product_dict['image_url'],
+        store=product_dict['store'])
+    return product
 
 
 def find_products_with_query(request, query_word):
