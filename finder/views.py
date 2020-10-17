@@ -59,13 +59,26 @@ def render_main(request):
     return render(request, 'finder/main.html', context)
 
 
+def is_product_on_database(product_dict):
+    ''' Checks whether product has already been inserted by some fields on the dictionary '''
+    try:
+        Product.objects.get(name=product_dict['name'], store=product_dict['store'], price=product_dict['price'])
+        return True
+    except Product.DoesNotExist:
+        return False
+
+
 def create_product_model_from_dict(product_dict):
-    product = Product.objects.create(
-        name=product_dict['name'],
-        price=product_dict['price'],
-        link=product_dict['link'],
-        image_url=product_dict['image_url'],
-        store=product_dict['store'])
+    ''' Creates product on the server from its dictionary after checking it hasnt been already inserted in the database '''
+    if not is_product_on_database(product_dict):
+        product = Product.objects.create(
+            name=product_dict['name'],
+            price=product_dict['price'],
+            link=product_dict['link'],
+            image_url=product_dict['image_url'],
+            store=product_dict['store'])
+    else:
+        product = None
     return product
 
 
