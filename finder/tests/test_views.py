@@ -27,8 +27,12 @@ class TestViews:
 
 
 class TestModelCreation:
-    def test_should_create_product_model_from_dict(self):
-        prod_dict = {
+    @pytest.mark.parametrize('name,expected_product_type, database_total', [
+        ('Camera GOPRO HERO 10 Black', 'NoneType', 1),
+        ('Camera GOPRO HERO 7 Silver', 'Product', 2)
+    ])
+    def test_should_create_product_model_from_dict(self, name, expected_product_type, database_total):
+        product_dict = {
             'name': 'Camera GOPRO HERO 10 Black',
             'price_str': 'R$ 4.299,90',
             'price': 4299.90,
@@ -37,8 +41,34 @@ class TestModelCreation:
             'store': 'americanas'
         }
 
-        product = create_product_model_from_dict(prod_dict)
+        product = create_product_model_from_dict(product_dict)
         assert type(product) == Product
-        assert product.name == prod_dict['name']
-        assert product.price == prod_dict['price']
-        assert product.store == prod_dict['store']
+        assert product.name == product_dict['name']
+        assert product.price == product_dict['price']
+        assert product.store == product_dict['store']
+
+        # Creating new dictionary with custom name to check whether is on database or not
+        product_dict2 = {**product_dict, 'name': name}
+        new_product = create_product_model_from_dict(product_dict2)
+        assert new_product.__class__.__name__ == expected_product_type
+        assert Product.objects.count() == database_total
+
+    @pytest.mark.parametrize('name,expected_check', [
+        ('Camera GOPRO HERO 10 Black', True),
+        ('Camera GOPRO HERO 7 Silver', False)
+    ])
+    def test_should_check_is_product_on_database(self, name, expected_check):
+        product_dict = {
+            'name': 'Camera GOPRO HERO 10 Black',
+            'price_str': 'R$ 4.299,90',
+            'price': 4299.90,
+            'link': 'link_url',
+            'image_url': 'image_url',
+            'store': 'americanas'
+        }
+
+        create_product_model_from_dict(product_dict)
+        # Creating new dictionary with custom name to check whether is on database or not
+        product_dict2 = {**product_dict, 'name': name}
+        check = is_product_on_database(product_dict2)
+        assert check == expected_check
