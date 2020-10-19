@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views import View
+from django.core import serializers
 from typing import List
 import sys
 sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furniture Scraping\\')
@@ -96,10 +97,23 @@ def create_product_model_from_dict(product_dict):
 
 class SearchProductsWithQueryView(View):
     def get(self, request, **kwargs):
+        import json
         parsed_query = self.kwargs['query_word'].replace('-', ' ')
         products_dicts = get_products_from_query(parsed_query)
 
         # Saving on JSON for the template to show data from this
         save_products_on_json(products_dicts, 'search_products.json')
-        # import pdb; pdb.set_trace()
-        return JsonResponse({'products': products_dicts})
+
+        # Saves products on database
+        newly_created_products = []
+        for prod_dict in products_dicts:
+            created_product = create_product_model_from_dict(prod_dict)
+            if created_product:
+                newly_created_products.append(created_product)
+        
+        # Get the database products serialized to be sent as response then we already filter out the dictionaries which had the same products
+        # products = Product.objects.filter(id__in=[prod.id for prod in newly_created_products])
+        data = serializers.serialize('json', newly_created_products)
+        data_with_only_fields = [prod['fields'] for prod in json.loads(data)]
+
+        return JsonResponse({'products': data_with_only_fields})
