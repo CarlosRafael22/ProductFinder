@@ -83,9 +83,20 @@ def create_product_model_from_dict(product_dict):
     return product
 
 
-def search_products_with_query(request, query_word):
-    if request.method == 'GET':
-        parsed_query = query_word.replace('-', ' ')
+# def search_products_with_query(request, query_word):
+#     if request.method == 'GET':
+#         parsed_query = query_word.replace('-', ' ')
+#         products_dicts = get_products_from_query(parsed_query)
+
+#         # Saving on JSON for the template to show data from this
+#         save_products_on_json(products_dicts, 'search_products.json')
+#         # import pdb; pdb.set_trace()
+#         return JsonResponse({'products': products_dicts})
+
+
+class SearchProductsWithQueryView(View):
+    def get(self, request, **kwargs):
+        parsed_query = self.kwargs['query_word'].replace('-', ' ')
         products_dicts = get_products_from_query(parsed_query)
 
         # Saving on JSON for the template to show data from this

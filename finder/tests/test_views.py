@@ -30,7 +30,7 @@ class oiTestViewsMethods:
 class TestViews:
     def test_should_search_products_with_query(self, client):
         import json
-        search_url = reverse('finder-search', args=['goblet of fire'])
+        search_url = reverse('finder-search', args=['goblet-of-fire'])
         response = client.get(search_url)
         # assert type(response['products']) == list
         json_response = json.loads(response.content)
