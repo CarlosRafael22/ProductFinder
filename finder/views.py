@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views import View
 from typing import List
 import sys
 sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furniture Scraping\\')
@@ -10,7 +11,7 @@ from .models import Product
 
 def get_products_from_query(query: str) -> List[dict]:
     ''' Returns a list of dictionaries with the products queried with the DataRetriever query_for method '''
-    retriever = DataRetriever(['submarino', 'extra', 'casasbahia'])
+    retriever = DataRetriever(['submarino', 'extra'])
     products_dicts = retriever.query_for(query)
     return products_dicts
 
@@ -82,11 +83,12 @@ def create_product_model_from_dict(product_dict):
     return product
 
 
-def find_products_with_query(request, query_word):
-    parsed_query = query_word.replace('-', ' ')
-    products_dicts = get_products_from_query(parsed_query)
+def search_products_with_query(request, query_word):
+    if request.method == 'GET':
+        parsed_query = query_word.replace('-', ' ')
+        products_dicts = get_products_from_query(parsed_query)
 
-    # Saving on JSON for the template to show data from this
-    save_products_on_json(products_dicts, 'search_products.json')
-    # import pdb; pdb.set_trace()
-    return JsonResponse({'products': products_dicts})
+        # Saving on JSON for the template to show data from this
+        save_products_on_json(products_dicts, 'search_products.json')
+        # import pdb; pdb.set_trace()
+        return JsonResponse({'products': products_dicts})

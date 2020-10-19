@@ -1,9 +1,10 @@
 from finder.views import *
 from finder.models import Product
+from django.urls import reverse
 import pytest
 pytestmark = pytest.mark.django_db
 
-class TestViews:
+class oiTestViewsMethods:
     def test_should_get_products_from_query(self):
         import os
         products_dicts = get_products_from_query('cadeira gamer')
@@ -26,7 +27,23 @@ class TestViews:
                 products = retrieve_products_from_json(file_name)
 
 
-class TestModelCreation:
+class TestViews:
+    def test_should_search_products_with_query(self, client):
+        import json
+        search_url = reverse('finder-search', args=['goblet of fire'])
+        response = client.get(search_url)
+        # assert type(response['products']) == list
+        json_response = json.loads(response.content)
+        products_dicts = json_response['products']
+        assert type(products_dicts) == list
+        # If there are products then check whether the first has these attributes
+        if len(products_dicts) > 0:
+            assert products_dicts[0].get('name', None) is not None
+            assert products_dicts[0].get('price', None) is not None
+            assert products_dicts[0].get('link', None) is not None
+
+
+class oiTestModelCreation:
     @pytest.mark.parametrize('name,expected_product_type, database_total', [
         ('Camera GOPRO HERO 10 Black', 'NoneType', 1),
         ('Camera GOPRO HERO 7 Silver', 'Product', 2)
