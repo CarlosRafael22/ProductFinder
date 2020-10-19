@@ -63,3 +63,18 @@ class SearchProductsWithQueryView(View):
         data_with_only_fields = search_products_with_query(self.kwargs['query_word'])
 
         return JsonResponse({'products': data_with_only_fields})
+
+
+class ShowProductsStoredOnDatabaseView(View):
+    def get(self, request):
+        from django.core import serializers
+        import json
+        from .services import show_products_stored_on_database
+        filtered_products = show_products_stored_on_database(request.GET)
+
+        # Manually serializing since its not using DRF yet
+        data = serializers.serialize('json', filtered_products)
+        data_with_only_fields = [prod['fields'] for prod in json.loads(data)]
+
+        context = {'products': data_with_only_fields, 'products_total': filtered_products.count()}
+        return render(request, 'finder/main.html', context)

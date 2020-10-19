@@ -67,3 +67,44 @@ def search_products_with_query(query_word):
     data = serializers.serialize('json', newly_created_products)
     data_with_only_fields = [prod['fields'] for prod in json.loads(data)]
     return data_with_only_fields
+
+
+def show_products_stored_on_database(query_filters_dict):
+    '''
+    
+    @query_filters_dict: {
+        'price__gte': 60
+        'price__lt': 89
+        'order_by_price': 'desc' / 'asc'
+    }
+    '''
+    products = Product.objects.all()
+
+    query_keys_list = [*query_filters_dict]
+    filtered_products = products
+    # If it comes with params then we need to filter before sending response
+    
+    if len(query_keys_list) > 0:
+        parsed_query = {}
+        for key, value in query_filters_dict.items():
+            if 'order_by_' not in key:
+                parsed_query[key] = float(value) if 'contains' not in key else value
+                attribute = None
+                order = None
+            else:
+                # If there is an order_by params we get the attribute its sorting and order
+                attribute = key.split('order_by_')[1]
+                order = value
+
+        # filtered_products = ProductDatabase.filter(**parsed_query)
+        filtered_products = Product.objects.filter(**parsed_query)
+        print(filtered_products)
+        # If there is an order_by params we get the attribute its sorting and order
+        if attribute and order:
+            # reversed = order == 'desc'
+            # filtered_products.sort(key=lambda prod: getattr(prod, attribute), reverse=reversed)
+            filter_order = '-' if order == 'desc' else ''
+            order_as = filter_order + attribute
+            filtered_products = filtered_products.order_by(order_as)
+        print(filtered_products)
+    return filtered_products
