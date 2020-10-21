@@ -8,7 +8,7 @@ from .models import Product
 
 def get_products_from_query(query: str) -> List[dict]:
     ''' Returns a list of dictionaries with the products queried with the DataRetriever query_for method '''
-    retriever = DataRetriever(['submarino', 'extra'])
+    retriever = DataRetriever(['submarino', 'extra', 'magazineluiza'])
     products_dicts = retriever.query_for(query)
     return products_dicts
 
@@ -37,7 +37,7 @@ def create_product_model_from_dict(product_dict):
     ''' Creates product on the server from its dictionary after checking it hasnt been already inserted in the database '''
     if not is_product_on_database(product_dict):
         product = Product.objects.create(
-            name=product_dict['name'],
+            name=product_dict['name'][:200],
             price=product_dict['price'],
             link=product_dict['link'],
             image_url=product_dict['image_url'],
