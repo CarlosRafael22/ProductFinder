@@ -1,0 +1,21 @@
+.product-card {
+    display: grid;
+    grid-template-columns: 300px;
+    grid-template-rows: 200px 100px 100px;
+    grid-template-areas: "image" "body" "extra";
+
+    font-family: roboto;
+    border-radius: 5px;
+    background: white;
+    text-align: center;
+    margin: 10px;
+}
+
+.product-card:hover {
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.9);
+}
+
+.extra-store {
+    display: inline-block;
+    margin-right: 20px;
+}

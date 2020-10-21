@@ -1,22 +1,29 @@
+{% load static %}
 <html>
     <head>
         <!-- CSS only -->
+    <link rel="stylesheet" type="text/css" href="{% static 'finder/main.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet"
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     </head>
     <body>
-        <h1>Teste do Finder</h1>
+        <h1>Teste do MAGAZON</h1>
         <h3>Retornou um total de {{products_total}} items</h3>
         <div class="row">
             {% for product_dict in products %}
-            <div class="col-md-3" style="border: 1px solid #e3e9ef; border-radius: 5px">
+            <div class="product-card" >
                 <a href={{product_dict.link}}>
-                    <img src={{product_dict.image_url}} class="mr-3" alt={{product_dict.name}} width="200" height="200">
-                    <div class="media-body">
+                    <img src={{product_dict.image_url}} class="mr-3 card-image" alt={{product_dict.name}} width="200" height="200">
+                    <div class="media-body card-body">
                         <h6 class="mt-0">{{product_dict.name}}</h6>
                         <p>R$ {{product_dict.price}}</p>
-                        <p>Visto em: {{product_dict.store}}</p>
+                    </div>
+                    <div class="card-extra">
+                        <p class="extra-store">Visto em: {{product_dict.store}}</p>
+                        <i class="fa fa-heart-o"></i>
                     </div>
                 </a>
             </div>
