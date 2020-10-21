@@ -78,3 +78,18 @@ class ShowProductsStoredOnDatabaseView(View):
 
         context = {'products': data_with_only_fields, 'products_total': filtered_products.count()}
         return render(request, 'finder/main.html', context)
+
+
+class RetrieveProductsAPI(View):
+    def get(self, request):
+        from .services import show_products_stored_on_database
+        import json
+
+        filtered_products = show_products_stored_on_database(request.GET)
+
+        # Manually serializing since its not using DRF yet
+        data = serializers.serialize('json', filtered_products)
+        data_with_only_fields = [prod['fields'] for prod in json.loads(data)]
+
+        response = {'products': data_with_only_fields}
+        return JsonResponse(response)

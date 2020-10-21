@@ -60,3 +60,30 @@ class TestShowProductsStoredOnDatabaseView:
         show_url = reverse_querystring('finder-show', query_kwargs={'price__gte': 70})
         response = client.get(show_url)
         assert response.status_code == 200
+
+
+class TestRetrieveProductsAPIView:
+    def test_should_retrieve_products(self, client):
+        from finder.services import retrieve_products_from_json, create_product_model_from_dict
+        import json
+
+        # Putting test products on database
+        products_objects = retrieve_products_from_json('test_show_products.json')
+        previous_database_total = Product.objects.count()
+        for prod in products_objects:
+            create_product_model_from_dict(prod.__dict__)
+        current_database_total = Product.objects.count()
+        assert previous_database_total != current_database_total
+
+        show_url = reverse_querystring('retrieve-products', query_kwargs={'price__gte': 70})
+
+        response = client.get(show_url)
+        assert response.status_code == 200
+        # import pdb; pdb.set_trace()
+
+        json_response = json.loads(response.content)
+        products = json_response['products']
+        assert type(products) == list
+        assert products[0]['name'] is not None
+        assert products[0].get('store', None) is not None
+
