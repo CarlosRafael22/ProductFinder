@@ -39,8 +39,8 @@ def create_product_model_from_dict(product_dict):
         product = Product.objects.create(
             name=product_dict['name'][:200],
             price=product_dict['price'],
-            link=product_dict['link'],
-            image_url=product_dict['image_url'],
+            link=product_dict['link'][:200],
+            image_url=product_dict['image_url'][:200],
             store=product_dict['store'])
     else:
         product = None
