@@ -1,5 +1,5 @@
 from finder.views import *
-from finder.models import Product, User
+from finder.models import Product, User, Customer
 from django.urls import reverse
 import json
 import pytest
@@ -141,3 +141,28 @@ class TestCustomerSignUp:
 
         assert response.status_code == 400
         assert json_response['error'] == CustomerSignupAPI.fields_error_message
+
+    def test_should_succeed(self, client):
+        data = {
+            'name': 'Teste',
+            'username': 'test@mail.com',
+            'email': 'test@mail.com',
+            'password': 'asdasdadaas'
+        }
+
+        signup_url = reverse('signup')
+        response = client.post(signup_url, data=data)
+        json_response = json.loads(response.content)
+
+        assert response.status_code == 200
+        assert json_response['customer']['name'] == data['name']
+        assert json_response['customer']['user']['username'] == data['username']
+        assert json_response['customer']['user']['email'] == data['email']
+
+        customer = Customer.objects.latest('id')
+        assert customer.name == data['name']
+        assert customer.user.email == data['email']
+
+        user = User.objects.latest('id')
+        assert user.email == data['email']
+        assert user.username == data['username']

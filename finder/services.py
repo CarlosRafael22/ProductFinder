@@ -140,7 +140,10 @@ def handle_customer_signup(request_data: dict):
 
     try:
         customer = Customer.objects.create(name=name, user=user)
-        response = CustomerSerializer(customer)
+        serializer = CustomerSerializer(instance=customer)
+        response = {
+            'customer': serializer.data
+        }
         return response
     except Exception as excp:
         raise excp
