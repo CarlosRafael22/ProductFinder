@@ -17,6 +17,7 @@ class Product(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(User, related_name='customer', on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
 
 
 class Favorite(models.Model):
