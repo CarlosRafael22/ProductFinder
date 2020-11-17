@@ -1,6 +1,7 @@
 from finder.views import *
-from finder.models import Product
+from finder.models import Product, User
 from django.urls import reverse
+import json
 import pytest
 pytestmark = pytest.mark.django_db
 
@@ -87,3 +88,56 @@ class TestRetrieveProductsAPIView:
         assert products[0]['name'] is not None
         assert products[0].get('store', None) is not None
 
+
+class TestCustomerSignUp:
+    from finder.views import CustomerSignupAPI
+
+    def test_should_not_succeed_due_to_email_already_used(self, client):
+        # Creating the User with the email
+        user = User.objects.create_user('test@mail.com', 'test@mail.com', 'testmail')
+        data = {
+            'name': 'Teste',
+            'username': 'test@mail.com',
+            'email': 'test@mail.com',
+            'password': 'asdasdadaas'
+        }
+
+        signup_url = reverse('signup')
+        response = client.post(signup_url, data=data)
+        json_response = json.loads(response.content)
+
+        assert response.status_code == 400
+        assert json_response['error'] == CustomerSignupAPI.email_error_message
+    
+    def test_should_not_succeed_due_to_password_under_limit(self, client):
+        # Creating the User with the email
+        # user = User.objects.create_user('test@mail.com', 'test@mail.com', 'testmail')
+        data = {
+            'name': 'Teste',
+            'username': 'test@mail.com',
+            'email': 'test@mail.com',
+            'password': 'asdas'
+        }
+
+        signup_url = reverse('signup')
+        response = client.post(signup_url, data=data)
+        json_response = json.loads(response.content)
+
+        assert response.status_code == 400
+        assert json_response['error'] == CustomerSignupAPI.password_error_message
+    
+    def test_should_not_succeed_due_to_missing_field(self, client):
+        # Creating the User with the email
+        # user = User.objects.create_user('test@mail.com', 'test@mail.com', 'testmail')
+        data = {
+            'username': 'test@mail.com',
+            'email': 'test@mail.com',
+            'password': 'asdas'
+        }
+
+        signup_url = reverse('signup')
+        response = client.post(signup_url, data=data)
+        json_response = json.loads(response.content)
+
+        assert response.status_code == 400
+        assert json_response['error'] == CustomerSignupAPI.fields_error_message

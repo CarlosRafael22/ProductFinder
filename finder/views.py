@@ -110,5 +110,4 @@ class CustomerSignupAPI(APIView):
             return Response(response, status=status.HTTP_200_OK)
         except Exception as excp:
             error = { 'error': str(excp) }
-            import pdb; pdb.set_trace()
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
