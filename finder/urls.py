@@ -7,4 +7,5 @@ urlpatterns = [
     # path('search/<str:query_word>', views.search_products_with_query, name='finder-search'),
     path('search/<str:query_word>', views.SearchProductsWithQueryView.as_view(), name='finder-search'),
     path('api/products', views.RetrieveProductsAPI.as_view(), name='retrieve-products'),
+    path('api/signup', views.CustomerSignupAPI.as_view(), name='signup'),
 ]

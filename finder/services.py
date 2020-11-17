@@ -4,7 +4,7 @@ import sys
 sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furniture Scraping\\')
 from extractor import PageExtractor, DataRetriever
 from products import Product as ProductObject, ProductDatabase
-from .models import Product
+from .models import Product, Customer, User
 
 def get_products_from_query(query: str) -> List[dict]:
     ''' Returns a list of dictionaries with the products queried with the DataRetriever query_for method '''
@@ -108,3 +108,39 @@ def show_products_stored_on_database(query_filters_dict):
             filtered_products = filtered_products.order_by(order_as)
         print(filtered_products)
     return filtered_products
+
+
+def handle_customer_signup(request_data: dict):
+    '''
+        data = {
+            'name': 'Teste',
+            'username': 'test@mail.com',
+            'email': 'test@mail.com',
+            'password': 'asdas'
+        }
+    '''
+    from .views import CustomerSignupAPI
+    from .serializers import CustomerSerializer
+
+    try:
+        email = request_data['email']
+        username = request_data['username']
+        name = request_data['name']
+        password = request_data['password']
+    except Exception as excp:
+        raise Exception(CustomerSignupAPI.fields_error_message)
+
+    if len(password) < 6:
+        raise Exception(CustomerSignupAPI.password_error_message)
+
+    try:
+        user = User.objects.create_user(username, email, password)
+    except Exception as excp:
+        raise Exception(CustomerSignupAPI.email_error_message)
+
+    try:
+        customer = Customer.objects.create(name=name, user=user)
+        response = CustomerSerializer(customer)
+        return response
+    except Exception as excp:
+        raise excp

@@ -8,6 +8,9 @@ sys.path.insert(1, 'C:\\Users\\carlo\\Documents\\ESTUDOS\\Web Scraping\\Furnitur
 from extractor import PageExtractor, DataRetriever
 from products import Product as ProductObject, ProductDatabase
 from .models import Product
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
 # Create your views here.
@@ -93,3 +96,19 @@ class RetrieveProductsAPI(View):
 
         response = {'products': data_with_only_fields}
         return JsonResponse(response)
+
+
+class CustomerSignupAPI(APIView):
+    email_error_message = 'Email já cadastrado no sistema.'
+    password_error_message = 'Senha tem que ter no mínimo 6 caracteres.'
+    fields_error_message = 'Todos os campos devem ser fornecidos.'
+
+    def post(self, request):
+        from .services import handle_customer_signup
+        try:
+            response = handle_customer_signup(request.data)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as excp:
+            error = { 'error': str(excp) }
+            import pdb; pdb.set_trace()
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
